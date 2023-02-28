@@ -102,7 +102,7 @@ void Test()
 	try
 	{
 		cout << "IntArray a1(-1):\t";
-		IntArray a1(-1);
+		Array<T> a1(-1);
 	}
 	catch (const std::exception &e)
 	{
