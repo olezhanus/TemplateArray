@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <typeinfo>
 #include "bad_range.h"
 #include "bad_length.h"
 
@@ -263,7 +264,6 @@ void Array<T>::resize(size_t new_size)
 	{
 		return;
 	}
-	T *new_data;
 	size_t new_capacity = _capacity;
 
 	while (new_capacity / 2 > new_size)
@@ -277,8 +277,8 @@ void Array<T>::resize(size_t new_size)
 	if (new_capacity != _capacity)
 	{
 		_capacity = new_capacity;
-		new_data = new T[new_capacity];
-		for (size_t i = 0; i < std::min(new_size, _size); ++i)
+		T *new_data = new T[new_capacity];
+		for (size_t i = 0; i < new_size; ++i)
 		{
 			if (i < _size)
 			{
@@ -287,7 +287,15 @@ void Array<T>::resize(size_t new_size)
 		}
 		delete[] _data;
 		_data = new_data;
-		new_data = nullptr;
+	}
+	for (size_t i = _size; i < new_size; ++i)
+	{
+		if (typeid(T) == typeid(int8_t) || typeid(T) == typeid(int16_t) || typeid(T) == typeid(int32_t) || typeid(T) == typeid(long) || typeid(T) == typeid(int64_t) ||
+			typeid(T) == typeid(uint8_t) || typeid(T) == typeid(uint16_t) || typeid(T) == typeid(uint32_t) || typeid(T) == typeid(unsigned long) || typeid(T) == typeid(uint64_t) ||
+			typeid(T) == typeid(float_t) || typeid(T) == typeid(double_t) || typeid(T) == typeid(bool))
+		{
+			_data[i] = 0;
+		}
 	}
 	_size = new_size;
 }
@@ -297,10 +305,10 @@ Array<T> &Array<T>::operator=(const Array<T> &right)
 {
 	if (right._capacity != _capacity)
 	{
+		_capacity = right._capacity;
 		delete[] _data;
 		_data = new T[_capacity];
 	}
-	_capacity = right._capacity;
 	_size = right._size;
 	for (size_t i = 0; i < _size; ++i)
 	{
@@ -325,5 +333,3 @@ Array<T>::~Array()
 	delete[] _data;
 	_data = nullptr;
 }
-
-
